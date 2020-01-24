@@ -67,12 +67,13 @@ class CommandLineInterface
             puts "_________________________________________"
         end
             
-                
+        puts "PRESS ENTER TO CONTINUE"
+        gets.chomp
      
         @user_input = PROMPT.select("Would you like to:",
             ["Purchase Ticket_","Return to Main Menu" ,"Exit"])
        
-        
+        #########takes you to purchase_ticket_2 when purchase ticket.
     end
 
      def search_by_genre
@@ -159,16 +160,16 @@ class CommandLineInterface
                      @user_input = PROMPT.select("Which Concert Event ticket would you like to purchase: ",
                      ["#{concert.name}","NO THANKS", "Return to Main Menu" ])
                       @user_input = "Return to Main Menu_"  
-                     
-                end
+                 end
             end
 
 
             def purchase_ticket_2
-                @artist_ins.concerts.each do |concert| #fix
+                @artist_ins.concerts.each do |concert| 
                 @user_input = PROMPT.select("Which Concert Event ticket would you like to purchase: ",
                 ["#{concert.name}","NO THANKS","Return to Main Menu"])
                 
+
                     if @user_input = "#{concert.name}" 
                         @@cart << [concert.name, concert.price]
 
@@ -203,9 +204,10 @@ class CommandLineInterface
                 Concert.all.each do |concert|
                     puts  concert.name
                     puts "Event name: #{concert.name}"
-                    puts "Event Artist: #{concert.artist_id}"
+                    puts "Event Artist: #{Artist.find(concert.artist_id).name}"
                     puts "Event date: #{concert.date}"
                     puts "_________________________________________"
+
                     @user_input = "Return to Main Menu"
                 end
 
@@ -215,6 +217,8 @@ class CommandLineInterface
                     puts `clear`
                     puts @@cart.uniq
                     puts "_________________________________________"
+                    puts "PRESS ENTER TO CONTINUE"
+                    gets.chomp
                     @user_input = "Return to Main Menu__"  
             end
 
@@ -272,7 +276,7 @@ class CommandLineInterface
 
         def view_created_concerts
              puts `clear`
-             puts "Here is a list of all the concerts you have booked:"
+             puts "Here is your MOST RECENTLY BOOKED Concert Event:"
              puts "_________________________________________"
             @hell = Concert.all.find_by(name: @concert_name)
                 puts "Event Name: #{@hell.name}"
@@ -281,12 +285,14 @@ class CommandLineInterface
                 puts "Event Price: #{@hell.price}"
                 puts "Event Date: #{@hell.date}"
                 puts "_________________________________________"  
+                puts "PRESS ENTER TO CONTINUE"
+                gets.chomp
 
                 @user_input = "created concert" #takes you to created_concerts_menu_ops
         end
 
          def created_concerts_menu_ops
-            puts `clear`
+          
             @user_input = PROMPT.select("Would you like to:",
                 ["CREATE A CONCERT LISTING!" ,"UPDATE AN EXISTING CONCERT","DELETE THIS CONCERT","DELETE A CONCERT","Return to Main Menu","Exit"])
 
@@ -300,18 +306,13 @@ class CommandLineInterface
 
          def delete_this_concert
             @hell.destroy
+            @user_input = "UPDATE/DELETE A CONCERT"
          end
 
          def delete_created
             puts `clear`
-            Concert.all.each do |concert|
-                puts  concert.name
-                puts "Event ID: #{concert.id}"
-                puts "Event Artist: #{concert.artist_id}"
-                puts "Event date: #{concert.date}"
-                puts "_________________________________________"
-            
-            end
+            Concert.display_all_concerts
+
             @delete_this_concert = PROMPT.ask('Please match the Concert ID for the Concert Event you wish to DELETE:')
             Concert.all.destroy(@delete_this_concert)
             @user_input = "Return to Main Menu"
@@ -320,12 +321,38 @@ class CommandLineInterface
 
          def update_created_concert
             puts `clear`
-            puts "Please be cautious when updating concert event information!"
             puts "_________________________________________"
-            
-         end
+            Concert.display_all_concerts_for_updates
+            @update_this_concert = PROMPT.ask('Please match the Concert ID for the Concert Event you wish to UPDATE:')
+            con_being_updated = Concert.all.find_by(id: @update_this_concert)
+                puts `clear`
+                puts "HERE IS THE CONCERT EVENT YOU HAVE SELECTED TO UPDATE:"
+                puts con_being_updated.name
+                puts "Event ID: #{con_being_updated.id}"
+                puts "Event Price: #{con_being_updated.price}"
+                puts "Event Date: #{con_being_updated.date}"
+                puts "_________________________________________"
+            @choices = %w(name: price: date: )
+            @hrr = PROMPT.select("What information about the Concert Event would you like to UPDATE?", @choices)
+            puts "_________________________________________"
+            @hrr2 = PROMPT.ask("What is the NEW VALUE of the Concert Event attribute you've selected?")
+            @concert_ins_to_update = Concert.all.find_by(id: @update_this_concert)
+             if @hrr == "name:"
+                @concert_ins_to_update.update(name: "#{@hrr2}")
+             elsif @hrr == "price:"
+                @concert_ins_to_update.update(price: "#{@hrr2}")
+             else 
+                @concert_ins_to_update.update(date: "#{@hrr2}")
+             end
+             
+            puts `clear`
+            puts "Concert Event UPDATE COMPLETE!"
+            puts @concert_ins_to_update 
+            puts "Press Enter to continue"
+            gets.chomp
 
-   
-
+            @user_input = "UPDATE/DELETE A CONCERT"
+        end
 end
+
 
